@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap");
+
+        * {
+            box-sizing: border-box;
+            font-family: "Prompt", sans-serif;
+        }
+
+        body {
+            background-color: #f7f8fa; /* Light gray background similar to image */
+            color: #333;
+        }
+
+        /* Custom Styles for Digital Card based on image */
+        .digital-card {
+            background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d); /* Dark blue from image */
+            color: #ffffff;
+            border-radius: 0.75rem; /* 12px */
+            padding: 1.25rem; /* 20px */
+            margin-bottom: 1.5rem; /* 24px */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .digital-card-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .digital-card-info {
+            flex-grow: 1;
+        }
+
+        .digital-card-info h3 {
+            font-size: 1rem; /* 16px */
+            font-weight: 300; /* Lighter weight for "Digital Card" text */
+            margin-bottom: 0.5rem; /* 8px */
+        }
+
+        .digital-card-info p {
+            font-size: 0.9rem; /* 18px */
+            font-weight: 400;
+            margin-bottom: 0.25rem; /* 4px */
+            line-height: 1.4;
+        }
+         .digital-card-info p.label { /* For HN, Voucher Credit, Point labels */
+            font-size: 0.875rem; /* 14px */
+            font-weight: 400;
+            margin-bottom: 0.1rem;
+        }
+        .digital-card-info p.value {
+            font-size: 1.125rem; /* 18px */
+            font-weight: 600; /* Bold for values */
+            margin-bottom: 0.5rem;
+        }
+
+
+        .digital-card-image-container {
+            margin-left: 1rem; /* 16px */
+            flex-shrink: 0; /* Prevent image from shrinking */
+        }
+
+        #user-image-card { /* Specific ID for the image in the card */
+            width: 70px; /* Adjust size as needed */
+            height: 70px;
+            border-radius: 50%;
+            object-fit: cover; /* Ensure image covers the circle */
+            border: 2px solid rgba(255, 255, 255, 0.5); /* Optional: subtle border */
+        }
+
+        /* Menu Grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr); /* 2 columns by default */
+            gap: 1rem; /* 16px */
+            margin-bottom: 1.5rem;
+        }
+
+        @media (min-width: 768px) { /* For tablets and desktops */
+            .menu-grid {
+                /* grid-template-columns: repeat(3, 1fr); /* 3 columns on larger screens if needed */
+            }
+        }
+
+        .menu-item {
+            background-color: #ffffff;
+            border-radius: 0.9rem; /* 8px */
+            padding: 1.25rem 1rem; /* 20px 16px */
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            cursor: pointer; /* Indicate it's clickable */
+        }
+
+        .menu-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .menu-item i {
+            font-size: 2.2rem; /* 32px */
+            margin-bottom: 0.75rem; /* 12px */
+            color: #0a2d6e; /* Match card color or a theme color */
+        }
+
+        .menu-item p {
+            font-size: 0.875rem; /* 14px */
+            font-weight: 500;
+            color: #333;
+            line-height: 1.3;
+        }
+
+        /* Other styles from previous version, can be adjusted */
+        .card {
+            background-color: #fff;
+            border-radius: 0.75rem;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e40af;
+            margin-bottom: 1rem;
+            text-align: center;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 0.75rem;
+        }
+        .btn-primary {
+            background-color: #2563eb; color: #fff; padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem; text-align: center; display: inline-block;
+            font-weight: 500; transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-primary:hover { background-color: #1d4ed8; transform: translateY(-2px); }
+
+        .info-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6; }
+        .info-item:last-child { border-bottom: none; }
+        .info-item .label { font-size: 0.9rem; color: #4b5563; font-weight: 400; }
+        .info-item .value { font-size: 0.9rem; font-weight: 500; color: #1f2937; text-align: right; }
+        .info-item .value.highlight { font-weight: 600; color: #1e40af; }
+
+        .modal { display: none; position: fixed; z-index: 50; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; }
+        .modal-content { background-color: #fff; margin: auto; padding: 2rem; border-radius: 0.75rem; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); text-align: center; width: 90%; max-width: 450px; }
+        .modal-content .fa-spinner { color: #b171f5; font-size: 3rem; margin-bottom: 1rem; }
+        .modal-content h2 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .modal-content p { font-size: 0.9rem; color: #4b5563; margin-bottom: 1.5rem; }
+        .modal-content .btn-close-modal { background-color: #2563eb; color: white; padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 500; transition: background-color 0.3s ease; }
+        .modal-content .btn-close-modal:hover { background-color: #1d4ed8; }
+        .hidden { display: none !important; }
+        .warning-text { font-size: 0.8rem; color: #ef4444; text-align: center; margin-top: 1rem; padding: 0.75rem; background-color: #fee2e2; border-radius: 0.5rem; border: 1px solid #fca5a5; }
+
+        /* Header mimicking the app's top bar (Optional) */
+        .app-header {
+            background-color: #f7f8fa; /* Or #fff depending on exact look */
+            padding: 1rem;
+            text-align: center;
+            position: sticky; /* Makes it stick to the top */
+            top: 0;
+            z-index: 40; /* Below modals */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .app-header-title {
+            font-size: 1.125rem; /* 18px */
+            font-weight: 600;
+            color: #333;
+        }
+        .app-header-subtitle {
+            font-size: 0.75rem; /* 12px */
+            color: #666;
+        }
+        .app-header .close-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem; /* 24px */
+            color: #333;
+            cursor: pointer;
+        }
+   footer {
+      background-color: #1f2937;
+      color: #d1d5db;
+      padding: 1rem;
+      text-align: center;
+      border-radius: 0.5rem;
+      margin-top: 2rem;
+    }
+    </style>
+
+
+  <title>ข้อมูลบุคคล | เทศบาลนครเชียงใหม่</title>
+</head>
+
+<body class="antialiased">
+    <div id="loading-modal" class="modal hidden fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+        <div class="modal-content bg-white p-6 rounded-lg shadow-lg w-80 text-center">
+            <i class="fas fa-spinner fa-spin text-3xl text-purple-500"></i>
+            <h2 class="mt-4 text-xl font-semibold">กำลังโหลดข้อมูล...</h2>
+            <p>กรุณารอสักครู่ ระบบกำลังดึงข้อมูลส่วนบุคคลของท่าน</p>
+        </div>
+    </div>
+  
+   <div class="app-header">
+          <p class="app-header-title text-lg font-bold text-xl text-center">ระบบฐานข้อมูลบุคคล</p> <p class="app-header-subtitle" id="user-Chapter"></p> </div>
+
+  <div class="max-w-md mx-auto py-4"> <div class="digital-card">
+            <div class="digital-card-content">
+                <div class="digital-card-info">
+                   <span><i class="fas fa-user-circle"></i></span>
+                    <h2 style="display: inline;">Line ผู้ใช้งาน : <span id="user-name"></span></h2>
+                    <p id="user-fullname"></p>
+                    <p id="user-Score"></p>
+                    <p id="user-Target"></p>
+                    <p id="user-classroom"></p>
+                </div>
+                <div class="digital-card-image-container">
+                    <img id="user-image" src="https://lh5.googleusercontent.com/d/1GKzDfn-sF2UNGn50EEXRMvKHuU6khA0_" style="width: 90px; border-radius: 50%;" alt="Reward chest with a blue pig-like creature" class="mx-auto mb-2">
+                </div>
+          </div>
+  </div>
+  
+
+        <div class="menu-grid">
+            <div class="menu-item" onclick="showPersonalData()">
+                <i class="fas fa-user-circle"></i>
+                <p>ข้อมูล<br>ส่วนบุคคล</p>
+            </div>
+            <div class="menu-item" onclick="showLeaveData()">
+                <i class="fas fa-file-alt"></i>
+                <p>ข้อมูล<br>การลา</p>
+            </div>
+            <div class="menu-item" onclick="showCompetencyData()">
+                <i class="fas fa-users-cog"></i>
+                <p>App Competency<br>สมรรถนะรายบุคคล</p>
+            </div>
+            <div class="menu-item" onclick="showThaiRoyalData()">
+                <i class="fas fa-award"></i>
+                <p>ประวัติการรับ<br>พระราชทานเครื่องราชฯ</p>
+            </div>          
+        </div>
+  
+    <div id="personal-data-section" class="hidden">
+     <div class="card">  
+              <h3 class="card-title"><i class="fas fa-user-shield mr-2"></i>ข้อมูลส่วนบุคคล</h3>
+              <h2 id="user-Dateofjob" class="text-l text-left text-gray-800 mb-4"></h2>         
+              <h2 id="user-OfficialAge" class="text-l text-left text-gray-800 mb-4"></h2> 
+              <h2 id="user-Retired" class="text-l text-left text-gray-800 mb-4"></h2>
+              <h2 id="user-Salary" class="text-l text-left text-gray-800 mb-4"></h2>
+              <h2 id="user-Affiliation1" class="text-l text-left text-gray-800 mb-4"></h2> 
+              <h2 id="user-Affiliation2" class="text-l text-left text-gray-800 mb-4"></h2>   
+              <h2 id="user-Affiliation3" class="text-l text-left text-gray-800 mb-4"></h2>   
+              <h2 id="user-Affiliation4" class="text-l text-left text-gray-800 mb-4"></h2>   
+              <h2 id="user-Affiliation5" class="text-l text-left text-gray-800 mb-4"></h2>  
+              <h2 id="user-Degree" class="text-l text-left text-gray-800 mb-4"></h2>  
+              <h2 id="user-educational" class="text-l text-left text-gray-800 mb-4"></h2>          
+              <h2 id="user-ThaiRoyalDecoration" class="font-bold text-xl text-center text-gray-800 mb-4"></h2>
+              <h2 id="user-DateThaiRoyalDecoration" class="text-l text-left text-gray-800 mb-4"></h2> 
+              <h2 id="user-ThaiRoyalDecoration2" class="text-l text-left text-gray-800 mb-4"></h2>   
+              <div class="mt-8 text-center">
+                    <a id="user.Personnelrecord" href="#" target="_blank" class="btn-primary">
+                        <i class="fas fa-download mr-2"></i>Download ก.พ.7
+                    </a>
+                </div>
+                <p class="warning-text mt-6">
+                    <i class="fas fa-exclamation-triangle mr-1"></i>กรณีข้อมูลส่วนบุคคลของท่านไม่ถูกต้อง กรุณาติดต่อฝ่ายบรรจุแต่งตั้งและอัตรากำลัง โทร. 9057
+                </p>
+            </div>
+        </div>
+    
+        <div id="leave-data-section" class="hidden">
+         <div class="card">    
+            <h3 class="card-title"><i class="fas fa-file-alt mr-2"></i>ข้อมูลการลา</h3>
+            <h2 class="text-lg font-bold text-xl text-center">สรุปการลาพักผ่อน</h2>  
+            <h2 id="user-vacationS1" class="text-l text-left text-gray-800 mb-4"></h2>   
+            <h2 id="user-vacationS2" class="text-l text-left text-gray-800 mb-4"></h2>    
+            <h2 id="user-Totelvacation" class="font-bold text-l text-left text-gray-800 mb-4"></h2>   
+            <h2 id="user-Useofvacation" class="text-l text-left text-gray-800 mb-4"></h2> 
+            <h2 id="user-Restofvacation" class="font-bold text-l text-left text-gray-800 mb-4"></h2>  
+            <h2 class="text-lg font-bold text-xl text-center">สรุปการลาป่วยและลากิจ</h2>   
+            <h2 id="user-Sickleave" class="text-l text-left text-gray-800 mb-4"></h2>
+            <h2 id="user-PersonalLeave" class="text-l text-left text-gray-800 mb-4"></h2> 
+            <p class="warning-text"> <i class="fas fa-exclamation-triangle mr-1"></i>กรณีวันลาของท่านไม่ถูกต้อง กรุณาติดต่อผู้รับผิดชอบคุมการลาที่ท่านสังกัดส่วนราชการ </p>      
+          </div>
+        </div>
+
+          
+           <div id="ThaiRoyal-data-section" class="hidden">
+             <div class="card">    
+                <h3 class="card-title"><i class="fas fa-award mr-2"></i>ข้อมูลการรับพระราชทานเครื่องราชฯ</h3>
+              <div class=" text p-4">
+              <div class="grid grid-cols-6 text-lg font-bold mb-2">
+              </div>
+
+              <div id="data-container3" class="space-y-2">
+                <!-- Data will be appended here -->
+              </div>
+            </div>
+                <p class="warning-text"> <i class="fas fa-exclamation-triangle mr-1"></i>กรณีข้อมูลการรับพระราชทานเครื่องราชฯ ของท่านไม่ถูกต้อง กรุณาติดต่อฝ่ายบรรจุแต่งตั้งและอัตรากำลัง โทร. 9057 </p>      
+              </div>
+          </div>        
+    
+    
+    
+    
+         <div id="Competency-data-section" class="hidden">
+          <div class="card">    
+            <h3 class="card-title"><i class="fas fa-users-cog mr-2"></i>ข้อมูลสมรรถนะรายบุคคล</h3>
+              <div class="bg-blue-700 text-white p-4">
+              <div class="grid grid-cols-6 text-lg font-bold mb-2">
+                <span class="col-span-4 text-center large-font ">สมรรถนะหลัก</span>
+                <span class="col-span-2 text-center large-font">ระดับความคาดหวัง</span>
+              </div>
+
+              <div id="data-container" class="space-y-2">
+                <!-- Data will be appended here -->
+              </div>
+            </div>
+                <div class="bg-blue-700 text-white p-4">
+              <div class="grid grid-cols-6 text-lg font-bold mb-2">
+                <span class="col-span-4 text-center large-font ">สมรรถนะประจำสายงาน/สมรรถนะประจำสายผู้บริหาร</span>
+                <span class="col-span-2 text-center large-font">ระดับความคาดหวัง</span>
+              </div>
+
+              <div id="data-container2" class="space-y-2">
+                <!-- Data will be appended here -->
+              </div>
+            </div>             
+    
+           
+           
+           
+           
+           
+           
+           
+          </div>
+        </div>
+    
+      
+      <div id="reward-container" class="flex justify-center space-x-1 mb-4">
+        <!-- Reward divs will be appended here -->
+      </div>
+
+
+
+  <div id="no-access-modal" class="modal hidden fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+  <div class="modal-content bg-white p-6 rounded-lg shadow-lg w-80 text-center">
+    <i class="fas fa-exclamation-triangle text-red-600 text-4xl mb-2"></i>
+    <h2 class="mt-4 text-xl font-semibold">คุณไม่มีสิทธิใช้งานในระบบ</h2>
+    <p> กรุณาลงทะเบียนก่อนการใช้งาน หากท่านลงทะเบียนแล้วยังไม่มีสิทธิใช้งานกรุณาติดต่อกองการเจ้าหน้าที่ เทศบาลนครเชียงใหม่</p>    
+    <button id="close-modal" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-800">ปิด</button>
+  </div>
+</div>
+    
+
+   <script>
+        // Initialize LIFF
+        async function initializeLiff() {
+            try {
+                await liff.init({ liffId: "2006883512-pjQMKWVw" }); // YOUR_LIFF_ID
+                if (liff.isLoggedIn()) {
+                    getUserProfile();
+                } else {
+                    liff.login();
+                }
+            } catch (error) {
+                console.error("LIFF Initialization failed", error);
+                document.getElementById('loading-modal').classList.add('hidden');
+            }
+        }
+
+    // Fetch user profile
+  async function getUserProfile() {
+            try {
+                const profile = await liff.getProfile();
+                document.getElementById('user-name').textContent = profile.displayName;
+                if (profile.pictureUrl) {
+                    document.getElementById('user-image').src = profile.pictureUrl;
+                }
+                fetchData(profile.userId);
+            } catch (error) {
+                console.error("Failed to get user profile", error);
+                document.getElementById('loading-modal').classList.add('hidden');
+            }
+        }
+
+    // Fetch data from JSON URL and filter based on user ID
+    async function fetchData(userId) {
+            document.getElementById('loading-modal').classList.remove('hidden');
+            document.getElementById('loading-modal').style.display = 'flex';
+
+      try {
+        const response = await fetch('https://opensheet.elk.sh/1Bm9zGRTqQ9kP23N9YFfdeUh4y9dHU8gQx6m6CU1bpkU/Score');
+        const data = await response.json();
+        const filteredData = data.filter(item => item.UID === userId);
+
+        // Call functions to display the data
+        displayData(filteredData);
+        displayData2(filteredData);     
+        displayData3(filteredData);          
+        displayRewards(filteredData);
+        displayUserInfo(filteredData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        // Hide loading modal when done
+        document.getElementById('loading-modal').classList.add('hidden');
+      }
+    }
+
+    // Display filtered data
+    // Display filtered data
+    function displayData(data) {
+      const container = document.getElementById('data-container');
+      container.innerHTML = '';
+      data.forEach(item => {
+        const imgTag = item.Reward ? `<img src="${item.Reward}" class="col-span-1 mx-auto" style="width: 30px;" alt="Reward icon">` : '';
+        const row = `
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.CC1}</span>
+            <span class="col-span-2 text-black text-center">${item.CCp1}</span>
+            ${imgTag}
+          </div>
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.CC2}</span>
+            <span class="col-span-2 text-black text-center">${item.CCp2}</span>
+            ${imgTag}
+          </div>
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.CC3}</span>
+            <span class="col-span-2 text-black text-center">${item.CCp3}</span>
+            ${imgTag}
+          </div>  
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.CC4}</span>
+            <span class="col-span-2 text-black text-center">${item.CCp4}</span>
+            ${imgTag}
+          </div>       
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.CC5}</span>
+            <span class="col-span-2 text-black text-center">${item.CCp5}</span>
+            ${imgTag}
+          </div>          
+        `;
+        container.innerHTML += row;
+      });
+    }
+    
+        function displayData2(data) {
+      const container = document.getElementById('data-container2');
+      container.innerHTML = '';
+      data.forEach(item => {
+        const imgTag = item.Reward ? `<img src="${item.Reward}" class="col-span-1 mx-auto" style="width: 30px;" alt="Reward icon">` : '';
+        const row = `
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.TC1}</span>
+            <span class="col-span-2 text-black text-center">${item.TCp1}</span>
+            ${imgTag}
+          </div>
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.TC2}</span>
+            <span class="col-span-2 text-black text-center">${item.TCp2}</span>
+            ${imgTag}
+          </div>
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.TC3}</span>
+            <span class="col-span-2 text-black text-center">${item.TCp3}</span>
+            ${imgTag}
+          </div>  
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.TC4}</span>
+            <span class="col-span-2 text-black text-center">${item.TCp4}</span>
+            ${imgTag}
+          </div>       
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.TC5}</span>
+            <span class="col-span-2 text-black text-center">${item.TCp5}</span>
+            ${imgTag}
+          </div>          
+        `;
+        container.innerHTML += row;
+      });
+    }
+
+        function displayData3(data) {
+      const container = document.getElementById('data-container3');
+      container.innerHTML = '';
+      data.forEach(item => {
+        const imgTag = item.Reward ? `<img src="${item.Reward}" class="col-span-1 mx-auto" style="width: 30px;" alt="Reward icon">` : '';
+        const row = `
+            <h2 class="text-lg font-bold text-xl mb-4">มหาวชิรมงกฎุ (ม.ว.ม.)</h2>  
+            <div class="overflow-x-auto bg-gray-100 p-4 rounded-lg shadow-md">
+              <table class="min-w-full table-auto text-sm text-gray-700">
+                <thead>
+                  <tr class="bg-gray-200">
+                    <th class="px-4 py-2 text-center font-semibold">หัวข้อ</th>
+                    <th class="px-4 py-2 text-center font-semibold">รายละเอียด</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="px-4 py-2">วันที่ได้รับฯ</td>
+                    <td class="px-4 py-2 text-black">${item.Rt1date}</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-2">ราชกิจจานุเบกษา</td>
+                    <td class="px-4 py-2 text-black">${item.Rt1}</td>${imgTag}
+                  </tr>
+                </tbody>
+              </table>
+            </div> 
+            <h2 class="text-lg font-bold text-xl">ประถมาภรณ์ช้างเผือก (ป.ช.)</h2>  
+            <div class="overflow-x-auto bg-gray-100 p-4 rounded-lg shadow-md">
+              <table class="min-w-full table-auto text-sm text-gray-700">
+                <thead>
+                  <tr class="bg-gray-200">
+                    <th class="px-4 py-2 text-center font-semibold">หัวข้อ</th>
+                    <th class="px-4 py-2 text-center font-semibold">รายละเอียด</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="px-4 py-2">วันที่ได้รับฯ</td>
+                    <td class="px-4 py-2 text-black">${item.Rt2date}</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-2">ราชกิจจานุเบกษา</td>
+                    <td class="px-4 py-2 text-black">${item.Rt2}</td>${imgTag}
+                  </tr>
+                </tbody>
+              </table>
+            </div> 
+            <h2 class="text-lg font-bold text-xl">ประถมาภรณ์มงกุฎไทย (ป.ม.)</h2>  
+            <div class="overflow-x-auto bg-gray-100 p-4 rounded-lg shadow-md">
+              <table class="min-w-full table-auto text-sm text-gray-700">
+                <thead>
+                  <tr class="bg-gray-200">
+                    <th class="px-4 py-2 text-center font-semibold">หัวข้อ</th>
+                    <th class="px-4 py-2 text-center font-semibold">รายละเอียด</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="px-4 py-2">วันที่ได้รับฯ</td>
+                    <td class="px-4 py-2 text-black">${item.Rt3date}</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-2">ราชกิจจานุเบกษา</td>
+                    <td class="px-4 py-2 text-black">${item.Rt3}</td>${imgTag}
+                  </tr>
+                </tbody>
+              </table>
+            </div> 
+            <h2 class="text-lg font-bold text-xl">ทวีติยาภรณ์ช้างเผือก (ท.ช.)</h2>  
+            <div class="overflow-x-auto bg-gray-100 p-4 rounded-lg shadow-md">
+              <table class="min-w-full table-auto text-sm text-gray-700">
+                <thead>
+                  <tr class="bg-gray-200">
+                    <th class="px-4 py-2 text-center font-semibold">หัวข้อ</th>
+                    <th class="px-4 py-2 text-center font-semibold">รายละเอียด</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="px-4 py-2">วันที่ได้รับฯ</td>
+                    <td class="px-4 py-2 text-black">${item.Rt4date}</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-2">ราชกิจจานุเบกษา</td>
+                    <td class="px-4 py-2 text-black">${item.Rt4}</td>${imgTag}
+                  </tr>
+                </tbody>
+              </table>
+            </div>        
+            <h2 class="text-lg font-bold text-xl">ทวีติยาภรณ์มงกุฏไทย (ท.ม.)</h2>  
+            <div class="overflow-x-auto bg-gray-100 p-4 rounded-lg shadow-md">
+              <table class="min-w-full table-auto text-sm text-gray-700">
+                <thead>
+                  <tr class="bg-gray-200">
+                    <th class="px-4 py-2 text-center font-semibold">หัวข้อ</th>
+                    <th class="px-4 py-2 text-center font-semibold">รายละเอียด</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="px-4 py-2">วันที่ได้รับฯ</td>
+                    <td class="px-4 py-2 text-black">${item.Rt5date}</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-2">ราชกิจจานุเบกษา</td>
+                    <td class="px-4 py-2 text-black">${item.Rt5}</td>${imgTag}
+                  </tr>
+                </tbody>
+              </table>
+            </div> 
+            <h2 class="text-lg font-bold text-xl">ตริตาภรณ์ช้างเผือก (ต.ช.)</h2>  
+            <div class="overflow-x-auto bg-gray-100 p-4 rounded-lg shadow-md">
+              <table class="min-w-full table-auto text-sm text-gray-700">
+                <thead>
+                  <tr class="bg-gray-200">
+                    <th class="px-4 py-2 text-center font-semibold">หัวข้อ</th>
+                    <th class="px-4 py-2 text-center font-semibold">รายละเอียด</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="px-4 py-2">วันที่ได้รับฯ</td>
+                    <td class="px-4 py-2 text-black">${item.Rt6date}</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-2">ราชกิจจานุเบกษา</td>
+                    <td class="px-4 py-2 text-black">${item.Rt6}</td>${imgTag}
+                  </tr>
+                </tbody>
+              </table>
+            </div> 
+            <h2 class="text-lg font-bold text-xl">ตริตาภรณ์มงกุฎไทย (ต.ม.)</h2>  
+            <div class="overflow-x-auto bg-gray-100 p-4 rounded-lg shadow-md">
+              <table class="min-w-full table-auto text-sm text-gray-700">
+                <thead>
+                  <tr class="bg-gray-200">
+                    <th class="px-4 py-2 text-center font-semibold">หัวข้อ</th>
+                    <th class="px-4 py-2 text-center font-semibold">รายละเอียด</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="px-4 py-2">วันที่ได้รับฯ</td>
+                    <td class="px-4 py-2 text-black">${item.Rt7date}</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-2">ราชกิจจานุเบกษา</td>
+                    <td class="px-4 py-2 text-black">${item.Rt7}</td>${imgTag}
+                  </tr>
+                </tbody>
+              </table>
+            </div> 
+            <h2 class="text-lg font-bold text-xl">จัตุรถาภรณ์ช้างเผือก (จ.ช.)</h2>  
+            <div class="overflow-x-auto bg-gray-100 p-4 rounded-lg shadow-md">
+              <table class="min-w-full table-auto text-sm text-gray-700">
+                <thead>
+                  <tr class="bg-gray-200">
+                    <th class="px-4 py-2 text-center font-semibold">หัวข้อ</th>
+                    <th class="px-4 py-2 text-center font-semibold">รายละเอียด</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="px-4 py-2">วันที่ได้รับฯ</td>
+                    <td class="px-4 py-2 text-black">${item.Rt8date}</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-2">ราชกิจจานุเบกษา</td>
+                    <td class="px-4 py-2 text-black">${item.Rt8}</td>${imgTag}
+                  </tr>
+                </tbody>
+              </table>
+            </div>             
+            <h2 class="text-lg font-bold text-xl">จัตุรถาภรณ์มงกุฎไทย (จ.ม.)</h2>  
+            <div class="overflow-x-auto bg-gray-100 p-4 rounded-lg shadow-md">
+              <table class="min-w-full table-auto text-sm text-gray-700">
+                <thead>
+                  <tr class="bg-gray-200">
+                    <th class="px-4 py-2 text-center font-semibold">หัวข้อ</th>
+                    <th class="px-4 py-2 text-center font-semibold">รายละเอียด</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="px-4 py-2">วันที่ได้รับฯ</td>
+                    <td class="px-4 py-2 text-black">${item.Rt9date}</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-2">ราชกิจจานุเบกษา</td>
+                    <td class="px-4 py-2 text-black">${item.Rt9}</td>${imgTag}
+                  </tr>
+                </tbody>
+              </table>
+            </div>            
+            <h2 class="text-lg font-bold text-xl">เบญจมาภรณ์ช้างเผือก (บ.ช.)</h2>  
+            <div class="overflow-x-auto bg-gray-100 p-4 rounded-lg shadow-md">
+              <table class="min-w-full table-auto text-sm text-gray-700">
+                <thead>
+                  <tr class="bg-gray-200">
+                    <th class="px-4 py-2 text-center font-semibold">หัวข้อ</th>
+                    <th class="px-4 py-2 text-center font-semibold">รายละเอียด</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="px-4 py-2">วันที่ได้รับฯ</td>
+                    <td class="px-4 py-2 text-black">${item.Rt10date}</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-2">ราชกิจจานุเบกษา</td>
+                    <td class="px-4 py-2 text-black">${item.Rt10}</td>${imgTag}
+                  </tr>
+                </tbody>
+              </table>
+            </div>            
+            <h2 class="text-lg font-bold text-xl">เบญจมาภรณ์มงกุฎไทย (บ.ม.)</h2>  
+            <div class="overflow-x-auto bg-gray-100 p-4 rounded-lg shadow-md">
+              <table class="min-w-full table-auto text-sm text-gray-700">
+                <thead>
+                  <tr class="bg-gray-200">
+                    <th class="px-4 py-2 text-center font-semibold">หัวข้อ</th>
+                    <th class="px-4 py-2 text-center font-semibold">รายละเอียด</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="px-4 py-2">วันที่ได้รับฯ</td>
+                    <td class="px-4 py-2 text-black">${item.Rt11date}</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-2">ราชกิจจานุเบกษา</td>
+                    <td class="px-4 py-2 text-black">${item.Rt11}</td>${imgTag}
+                  </tr>
+                </tbody>
+              </table>
+            </div>             
+            <h2 class="text-lg font-bold text-xl">เหรียญจักรพรรดิมาลา (ร.จ.พ.)</h2>  
+            <div class="overflow-x-auto bg-gray-100 p-4 rounded-lg shadow-md">
+              <table class="min-w-full table-auto text-sm text-gray-700">
+                <thead>
+                  <tr class="bg-gray-200">
+                    <th class="px-4 py-2 text-center font-semibold">หัวข้อ</th>
+                    <th class="px-4 py-2 text-center font-semibold">รายละเอียด</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="px-4 py-2">วันที่ได้รับฯ</td>
+                    <td class="px-4 py-2 text-black">${item.Rt12date}</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-2">ราชกิจจานุเบกษา</td>
+                    <td class="px-4 py-2 text-black">${item.Rt12}</td>${imgTag}
+                  </tr>
+                </tbody>
+              </table>
+            </div>          
+          
+        `;
+        container.innerHTML += row;
+      });
+    }     
+     
+
+    // Display rewards and count non-grey rewards
+    function displayRewards(data) {
+      const rewardContainer = document.getElementById('reward-container');
+      rewardContainer.innerHTML = '';
+      let nonGreyCount = 0;
+
+      data.forEach(item => {
+        let colorClass = "bg-white-100";
+        const target = parseFloat(item.Target);
+        const score = parseFloat(item.Score);
+        const percentage = (score / target) * 100;
+
+        if (percentage > 75) {
+          colorClass = "bg-green-300";
+          nonGreyCount++;
+        } else if (percentage > 50) {
+          colorClass = "bg-yellow-300";
+          nonGreyCount++;
+        } else if (percentage <= 50) {
+          colorClass = "bg-red-300";
+          nonGreyCount++;
+        }
+
+        const rewardDiv = `<div class="w-8 h-8 ${colorClass} rounded"></div>`;
+        rewardContainer.innerHTML += rewardDiv;
+      });
+
+    }
+
+    // Display user information
+    function displayUserInfo(data) {
+      if (data.length > 0) {
+        const user = data[0];
+        document.getElementById('user-fullname').textContent = `${user.Name}`;
+        document.getElementById('user-classroom').textContent = `สังกัด : ${user.Classroom}`;
+        document.getElementById('user-Chapter').textContent = `ประเภทพนักงาน : ${user.Chapter}`;
+        document.getElementById('user-Target').textContent = `เลขที่ตำแหน่ง : ${user.Target}`;
+        document.getElementById('user-Score').textContent = `ตำแหน่ง : ${user.Score}`;    
+        document.getElementById('user-Dateofjob').textContent = `วันที่รับราชการ : ${user.Dateofjob}`; 
+        document.getElementById('user-OfficialAge').textContent = `อายุราชการ : ${user.OfficialAge}`;  
+        document.getElementById('user-Retired').textContent = `ปีที่เกษียณอายุราชการ : ${user.Retired}`;     
+        document.getElementById('user-Salary').textContent = `เงินเดือนปัจจุบัน : ${user.Salary} บาท`;    
+        document.getElementById('user-Affiliation1').textContent = `งาน : ${user.Affiliation1}`;  
+        document.getElementById('user-Affiliation2').textContent = `กลุ่มงาน : ${user.Affiliation2}`;  
+        document.getElementById('user-Affiliation3').textContent = `ฝ่าย : ${user.Affiliation3}`;  
+        document.getElementById('user-Affiliation4').textContent = `ส่วน : ${user.Affiliation4}`;  
+        document.getElementById('user-Affiliation5').textContent = `สำนัก/กอง : ${user.Affiliation5}`;   
+        document.getElementById('user-ThaiRoyalDecoration').textContent = `เครื่องราชฯ ชั้นล่าสุด : ${user.ThaiRoyalDecoration}`;      
+        document.getElementById('user-DateThaiRoyalDecoration').textContent = `วันที่ได้รับเครื่องราชฯ : ${user.DateThaiRoyalDecoration}`;   
+        document.getElementById('user-ThaiRoyalDecoration2').textContent = `เครื่องราชฯ ที่อยู่ระหว่างเสนอขอ : ${user.ThaiRoyalDecoration2}`;   
+        document.getElementById('user-vacationS1').textContent = `วันลาพักผ่อนสะสม : ${user.vacationS1} วัน`;       
+        document.getElementById('user-vacationS2').textContent = `วันลาพักผ่อนประจำปี : ${user.vacationS2} วัน`;   
+        document.getElementById('user-Totelvacation').textContent = `รวมวันลาพักผ่อน : ${user.Totelvacation} วัน`;  
+        document.getElementById('user-Useofvacation').textContent = `ใช้วันลาพักผ่อนในปีงบประมาณนี้ไปแล้ว : ${user.Useofvacation} วัน`;     
+        document.getElementById('user-Restofvacation').textContent = `เหลือวันลาพักผ่อน : ${user.Restofvacation} วัน`;     
+        document.getElementById('user-Sickleave').textContent = `ลาป่วย : ${user.Sickleave} วัน`;    
+        document.getElementById('user-PersonalLeave').textContent = `ลากิจ : ${user.PersonalLeave} วัน`;
+        document.getElementById('user-Degree').textContent = `คุณวุฒิการศึกษาสูงสุด (ตามมาตรฐานกำหนดตำแหน่ง) : ${user.Degree}`;
+        document.getElementById('user-educational').textContent = `จากสถาบันการศึกษา : ${user.educational}`;  
+       const downloadLink = user.Personnelrecord || "#";  // Replace with correct field if it's different
+    document.getElementById('user.Personnelrecord').setAttribute('href', downloadLink);     
+    } else {
+      // Show the modern modal if no data
+      document.getElementById('no-access-modal').classList.remove('hidden');
+    }
+  }
+
+  // Close the modal when the close button is clicked
+  document.getElementById('close-modal').addEventListener('click', function() {
+    document.getElementById('no-access-modal').classList.add('hidden');
+    
+    // Close the current browser tab or window
+    window.close();
+  });
+
+    // Countdown timer
+    function countdownTimer(targetDate, countdownId) {
+      const countdownElement = document.getElementById(countdownId);
+
+      function updateCountdown() {
+        const now = new Date();
+        const timeRemaining = targetDate - now;
+
+        if (timeRemaining <= 0) {
+          countdownElement.innerHTML = '<div>Event Ended!</div>';
+          return;
+        }
+
+        const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+        countdownElement.textContent = `เหลือเวลาอีก ${days} วัน ${hours} ชั่วโมง ${minutes} นาที ${seconds} วินาที`;
+      }
+
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    }
+
+  
+     // Menu navigation placeholder
+        function navigateTo(page) {
+            console.log("Navigate to:", page);
+            // Implement actual navigation or LIFF openWindow here
+            // Example: liff.openWindow({ url: `https://yourdomain.com/${page}` });
+            Swal.fire('กำลังนำทาง...', `ไปยังส่วน ${page}`, 'info');
+        }
+
+        // Toggle visibility of data sections
+        function showPersonalData() {
+            document.getElementById('personal-data-section').classList.toggle('hidden');
+            document.getElementById('leave-data-section').classList.add('hidden'); // Hide other section          
+            document.getElementById('Competency-data-section').classList.add('hidden'); // Hide other section
+            document.getElementById('ThaiRoyal-data-section').classList.add('hidden'); // Hide other section          
+        }
+        function showLeaveData() {
+            document.getElementById('leave-data-section').classList.toggle('hidden');
+            document.getElementById('personal-data-section').classList.add('hidden'); // Hide other section
+            document.getElementById('Competency-data-section').classList.add('hidden'); // Hide other section    
+            document.getElementById('ThaiRoyal-data-section').classList.add('hidden'); // Hide other section          
+        }  
+        function showCompetencyData() {
+            document.getElementById('Competency-data-section').classList.toggle('hidden');
+            document.getElementById('personal-data-section').classList.add('hidden'); // Hide other section
+            document.getElementById('leave-data-section').classList.add('hidden'); // Hide other section   
+            document.getElementById('ThaiRoyal-data-section').classList.add('hidden'); // Hide other section          
+        }       
+        function showThaiRoyalData() {
+            document.getElementById('ThaiRoyal-data-section').classList.toggle('hidden');
+            document.getElementById('personal-data-section').classList.add('hidden'); // Hide other section
+            document.getElementById('leave-data-section').classList.add('hidden'); // Hide other section   
+            document.getElementById('Competency-data-section').classList.add('hidden'); // Hide other section          
+        }         
+     
+     
+    // Initialize LIFF on page load
+    window.onload = function () {
+      initializeLiff();
+      const targetDate = new Date('2024-10-10T00:00:00'); // Set your target date
+      countdownTimer(targetDate, 'countdown');
+    }
+  </script>
+
+<footer class="text-center text-lg-start bg-light text-muted" style="position: static; left: 0; bottom: 0; width: 100%;">
+  <div class="text-center p-4" style="font-size: 12px; background-color: rgba(0, 0, 0, 0);">
+    จัดทำโดย สุทธิเกียรติ พงษ์ไพบูลย์ นักทรัพยากรบุคคลชำนาญการ
+    &copy; <script>document.write(new Date().getFullYear())</script> Suttikeat Pongpaiboon. Human Resource Officer, Professional Level.
+  </div>
+</footer>
+  
+</body>
+
+</html>
