@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+
+  <!-- Sweet Alert -->
+  <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+  <!-- LIFF SDK -->
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Prompt:wght@400;600&display=swap");
+
+    * {
+      box-sizing: border-box;
+      font-family: "Prompt", sans-serif;
+    }
+
+    body {
+      background-color: #f9fafb;
+      color: #374151;
+    }
+
+    header {
+      background-color: #f77cc3;
+      color: #fff;
+      padding: 1.5rem;
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
+      font-weight: bold;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    footer {
+      background-color: #1f2937;
+      color: #d1d5db;
+      padding: 1rem;
+      text-align: center;
+      border-radius: 0.5rem;
+      margin-top: 2rem;
+    }
+
+    .card {
+      background-color: #fff;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .btn-primary {
+      background-color: #f59e0b;
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      text-align: center;
+      display: inline-block;
+      font-weight: bold;
+    }
+
+    .btn-primary:hover {
+      background-color: #d97706;
+    }
+
+    img {
+      border-radius: 50%;
+      margin: 1rem auto;
+      display: block;
+      width: 150px;
+      height: 150px;
+    }
+
+    .info {
+      margin-bottom: 1rem;
+    }
+
+    .info h2 {
+      font-size: 1rem;
+      color: #4b5563;
+    }
+
+    .info span {
+      font-weight: bold;
+      color: #1f2937;
+    }
+    
+    /* Modal Styles */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 80%;
+    max-width: 400px;
+  }
+  .hidden {
+    display: none;
+  }     
+ 
+    /* Modal Styles */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    justify-content: center;
+    align-items: center;
+  }
+  .modal-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 80%;
+    max-width: 400px;
+  }
+  .hidden {
+    display: none;
+  } 
+          /* Modal Styles for Loading */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background-color: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      width: 80%;
+      max-width: 400px;
+    }
+    .hidden {
+      display: none;
+    }
+        
+  </style>
+
+  <title>ระบบ Application Competency</title>
+</head>
+
+<body>
+    <!-- Loading Modal -->
+  <div id="loading-modal" class="modal hidden fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+    <div class="modal-content bg-white p-6 rounded-lg shadow-lg w-80 text-center">
+      <i class="fas fa-spinner fa-spin text-3xl text-pink-500"></i>
+      <h2 class="mt-4 text-xl font-semibold">กำลังโหลดข้อมูล...</h2>
+    </div>
+  </div>
+    
+  <header>
+    <h2 class="text-lg font-bold text-xl text-center">ระบบ Application Competency HR CMCity</h2> 
+    <div id="user-Chapter" class="text-sm mt-2"></div>
+  </header>
+
+<div class="max-w-4xl mx-auto">
+    <div class="card text-center">
+
+      <h2 class="text-lg font-bold text-xl text-center">Line ผู้ใช้งาน : <span id="user-name" class="font-bold text-xl text-gray-800 mb-2"></span> </h2>
+      
+      <img id="user-image" src="https://lh5.googleusercontent.com/d/1GKzDfn-sF2UNGn50EEXRMvKHuU6khA0_" style="width: 150px; border-radius: 50%;" alt="Reward chest with a blue pig-like creature" class="mx-auto mb-2">
+      <h2 id="user-fullname" class="font-bold text-xl text-gray-800 mb-2"></h2>
+      <h2 id="user-classroom" class="font-bold text-xl text-gray-800 mb-4"></h2>
+      <h2 id="user-Target" class="text-l text-left text-gray-800 mb-4"></h2> 
+      <h2 id="user-Score" class="text-l text-left text-gray-800 mb-4"></h2>   
+      <h2 id="user-Affiliation1" class="text-l text-left text-gray-800 mb-4"></h2> 
+      <h2 id="user-Affiliation2" class="text-l text-left text-gray-800 mb-4"></h2>   
+      <h2 id="user-Affiliation3" class="text-l text-left text-gray-800 mb-4"></h2>   
+      <h2 id="user-Affiliation4" class="text-l text-left text-gray-800 mb-4"></h2>   
+      <h2 id="user-Affiliation5" class="text-l text-left text-gray-800 mb-4"></h2>  
+    </div>
+  
+    <div class="card">  
+      <div class="bg-blue-700 text-white p-4">
+      <div class="grid grid-cols-6 text-lg font-bold mb-2">
+        <span class="col-span-4 text-center large-font ">สมรรถนะหลัก</span>
+        <span class="col-span-2 text-center large-font">ระดับความคาดหวัง</span>
+      </div>
+  
+      <div id="data-container" class="space-y-2">
+        <!-- Data will be appended here -->
+      </div>
+    </div>
+        <div class="bg-blue-700 text-white p-4">
+      <div class="grid grid-cols-6 text-lg font-bold mb-2">
+        <span class="col-span-4 text-center large-font ">สมรรถนะประจำสายงาน/สมรรถนะประจำสายผู้บริหาร</span>
+        <span class="col-span-2 text-center large-font">ระดับความคาดหวัง</span>
+      </div>
+  
+      <div id="data-container2" class="space-y-2">
+        <!-- Data will be appended here -->
+      </div>
+    </div>  
+    
+      <div id="reward-container" class="flex justify-center space-x-1 mb-4">
+        <!-- Reward divs will be appended here -->
+    </div>
+  </div>
+</div>
+
+    <div id="no-access-modal" class="modal hidden fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+    <div class="modal-content bg-white p-6 rounded-lg shadow-lg w-80 text-center">
+    <h2 class="text-xl font-semibold ">คุณไม่มีสิทธิใช้งานในระบบ</h2>
+    <h2 class="text-sm">กรุณาลงทะเบียนก่อนการใช้งาน หากท่าน</h2>
+    <h2 class="text-sm">ลงทะเบียนแล้วยังไม่มีสิทธิใช้งานกรุณาติดต่อ</h2>    
+    <h2 class="text-sm">กองการเจ้าหน้าที่ เทศบาลนครเชียงใหม่</h2>    
+    <button id="close-modal" class="mt-4 bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-700">ปิด</button>
+    </div>
+    </div>
+  
+  <script>
+    // Initialize LIFF
+    async function initializeLiff() {
+      await liff.init({ liffId: "2006883512-YOgDrk3Z" }); // Replace 'YOUR_LIFF_ID' with your LIFF ID
+      if (liff.isLoggedIn()) {
+        getUserProfile();
+      } else {
+        liff.login();
+      }
+    }
+
+    // Fetch user profile
+    async function getUserProfile() {
+      const profile = await liff.getProfile();
+      document.getElementById('user-name').textContent = profile.displayName;
+      document.getElementById('user-image').src = profile.pictureUrl;
+      fetchData(profile.userId);
+    }
+
+    // Fetch data from JSON URL and filter based on user ID
+    async function fetchData(userId) {
+            // Show loading modal
+      document.getElementById('loading-modal').classList.remove('hidden');
+
+      try {
+        const response = await fetch('https://opensheet.elk.sh/1Bm9zGRTqQ9kP23N9YFfdeUh4y9dHU8gQx6m6CU1bpkU/Competency');
+        const data = await response.json();
+        const filteredData = data.filter(item => item.UID === userId);
+
+        // Call functions to display the data
+      displayData(filteredData);
+      displayData2(filteredData);
+      displayRewards(filteredData);
+      displayUserInfo(filteredData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        // Hide loading modal when done
+        document.getElementById('loading-modal').classList.add('hidden');
+      }
+    }      
+
+    // Display filtered data
+    function displayData(data) {
+      const container = document.getElementById('data-container');
+      container.innerHTML = '';
+      data.forEach(item => {
+        const imgTag = item.Reward ? `<img src="${item.Reward}" class="col-span-1 mx-auto" style="width: 30px;" alt="Reward icon">` : '';
+        const row = `
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.CC1}</span>
+            <span class="col-span-2 text-black text-center">${item.CCp1}</span>
+            ${imgTag}
+          </div>
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.CC2}</span>
+            <span class="col-span-2 text-black text-center">${item.CCp2}</span>
+            ${imgTag}
+          </div>
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.CC3}</span>
+            <span class="col-span-2 text-black text-center">${item.CCp3}</span>
+            ${imgTag}
+          </div>  
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.CC4}</span>
+            <span class="col-span-2 text-black text-center">${item.CCp4}</span>
+            ${imgTag}
+          </div>       
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.CC5}</span>
+            <span class="col-span-2 text-black text-center">${item.CCp5}</span>
+            ${imgTag}
+          </div>          
+        `;
+        container.innerHTML += row;
+      });
+    }
+    
+        function displayData2(data) {
+      const container = document.getElementById('data-container2');
+      container.innerHTML = '';
+      data.forEach(item => {
+        const imgTag = item.Reward ? `<img src="${item.Reward}" class="col-span-1 mx-auto" style="width: 30px;" alt="Reward icon">` : '';
+        const row = `
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.TC1}</span>
+            <span class="col-span-2 text-black text-center">${item.TCp1}</span>
+            ${imgTag}
+          </div>
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.TC2}</span>
+            <span class="col-span-2 text-black text-center">${item.TCp2}</span>
+            ${imgTag}
+          </div>
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.TC3}</span>
+            <span class="col-span-2 text-black text-center">${item.TCp3}</span>
+            ${imgTag}
+          </div>  
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.TC4}</span>
+            <span class="col-span-2 text-black text-center">${item.TCp4}</span>
+            ${imgTag}
+          </div>       
+            <div class="grid grid-cols-6 items-center bg-gray-100 p-2 rounded">
+            <span class="col-span-4 text-black">${item.TC5}</span>
+            <span class="col-span-2 text-black text-center">${item.TCp5}</span>
+            ${imgTag}
+          </div>          
+        `;
+        container.innerHTML += row;
+      });
+    }
+
+    // Display rewards and count non-grey rewards
+    function displayRewards(data) {
+      const rewardContainer = document.getElementById('reward-container');
+      rewardContainer.innerHTML = '';
+      let nonGreyCount = 0;
+
+      data.forEach(item => {
+        let colorClass = "bg-white-300";
+        const target = parseFloat(item.Target);
+        const score = parseFloat(item.Score);
+        const percentage = (score / target) * 100;
+
+        if (percentage > 75) {
+          colorClass = "bg-green-300";
+          nonGreyCount++;
+        } else if (percentage > 50) {
+          colorClass = "bg-yellow-300";
+          nonGreyCount++;
+        } else if (percentage <= 50) {
+          colorClass = "bg-red-300";
+          nonGreyCount++;
+        }
+
+        const rewardDiv = `<div class="w-8 h-8 ${colorClass} rounded"></div>`;
+        rewardContainer.innerHTML += rewardDiv;
+      });
+
+    }
+
+    // Display user information
+    function displayUserInfo(data) {
+      if (data.length > 0) {
+        const user = data[0];
+        document.getElementById('user-fullname').textContent = `${user.Name}`;
+        document.getElementById('user-classroom').textContent = `สังกัด : ${user.Classroom}`;
+        document.getElementById('user-Chapter').textContent = `ประเภทพนักงาน : ${user.Chapter}`;
+        document.getElementById('user-Target').textContent = `เลขที่ตำแหน่ง : ${user.Target}`;
+        document.getElementById('user-Score').textContent = `ตำแหน่ง : ${user.Score}`;       
+        document.getElementById('user-Affiliation1').textContent = `งาน : ${user.Affiliation1}`;  
+        document.getElementById('user-Affiliation2').textContent = `กลุ่มงาน : ${user.Affiliation2}`;  
+        document.getElementById('user-Affiliation3').textContent = `ฝ่าย : ${user.Affiliation3}`;  
+        document.getElementById('user-Affiliation4').textContent = `ส่วน : ${user.Affiliation4}`;  
+        document.getElementById('user-Affiliation5').textContent = `สำนัก/กอง : ${user.Affiliation5}`;   
+        document.getElementById('user-Score2').textContent = `ข้อมูลสมรรถนะของตำแหน่ง : ${user.Score}`;      
+    } else {
+      // Show the modern modal if no data
+      document.getElementById('no-access-modal').classList.remove('hidden');
+    }
+  }
+
+  // Close the modal when the close button is clicked
+  document.getElementById('close-modal').addEventListener('click', function() {
+    document.getElementById('no-access-modal').classList.add('hidden');
+    
+    // Close the current browser tab or window
+    window.close();
+  });
+
+
+    // Countdown timer
+    function countdownTimer(targetDate, countdownId) {
+      const countdownElement = document.getElementById(countdownId);
+
+      function updateCountdown() {
+        const now = new Date();
+        const timeRemaining = targetDate - now;
+
+        if (timeRemaining <= 0) {
+          countdownElement.innerHTML = '<div>Event Ended!</div>';
+          return;
+        }
+
+        const days = Math.floor(timeRemaining / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+        countdownElement.textContent = `เหลือเวลาอีก ${days} วัน ${hours} ชั่วโมง ${minutes} นาที ${seconds} วินาที`;
+      }
+
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    }
+
+    // Initialize LIFF on page load
+    window.onload = function () {
+      initializeLiff();
+      const targetDate = new Date('2024-10-10T00:00:00'); // Set your target date
+      countdownTimer(targetDate, 'countdown');
+    }
+  </script>
+
+<footer class="text-center text-lg-start bg-light text-muted" style="position: static; left: 0; bottom: 0; width: 100%;">
+  <div class="text-center p-4" style="font-size: 12px; background-color: rgba(0, 0, 0, 0);">
+    จัดทำโดย สุทธิเกียรติ พงษ์ไพบูลย์ นักทรัพยากรบุคคลชำนาญการ
+    &copy; <script>document.write(new Date().getFullYear())</script> Suttikeat Pongpaiboon. Human Resource Officer, Professional Level.
+  </div>
+</footer>
+  
+</body>
+
+</html>
