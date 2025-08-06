@@ -755,6 +755,32 @@
                                 </tbody>
                             </table>
                         </div>
+                            <h2 class="text-lg font-bold text-xl">เหรียญประเภทอื่นๆ</h2>
+                            <div class="overflow-x-auto bg-gray-100 p-4 rounded-lg shadow-md">
+                            <table class="min-w-full table-auto text-sm text-gray-700">
+                                <thead>
+                                    <tr class="bg-gray-200">
+                                    <th class="px-4 py-2 text-center font-semibold">หัวข้อ</th>
+                                    <th class="px-4 py-2 text-center font-semibold">รายละเอียด</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                    <td class="px-4 py-2">ประเภท</td>
+                                    <td class="px-4 py-2 text-black">${item.Rt13else}</td>
+                                    </tr>
+                                    <tr>
+                                    <td class="px-4 py-2">วันที่ได้รับฯ</td>
+                                    <td class="px-4 py-2 text-black">${item.Rt13date}</td>
+                                    </tr>
+                                    <tr>
+                                    <td class="px-4 py-2">ราชกิจจานุเบกษา</td>
+                                    <td class="px-4 py-2 text-black">${item.Rt13}</td>${imgTag}
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
                         `;
                         container.innerHTML += row;
                     });
